@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Modal from '../modal/Modal'; 
 
-import SwiperCore, { Autoplay } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/autoplay';
+import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import Button, { OutlineButton } from '../button/Button';
-import Modal, { ModalContent } from '../modal/Modal';
+import Modal, { ModalContent } from '../modal/Modal'; // ✅ Only one import needed
 
 import tmdbApi, { category, movieType } from '../../api/tmdbApi';
 import apiConfig from '../../api/apiConfig';
@@ -40,7 +41,7 @@ const HeroSlide = () => {
                 grabCursor={true}
                 spaceBetween={0}
                 slidesPerView={1}
-                // autoplay={{delay: 3000}}
+                autoplay={{ delay: 3000 }}
             >
                 {
                     movieItems.map((item, i) => (
@@ -61,7 +62,7 @@ const HeroSlide = () => {
 
 const HeroSlideItem = props => {
 
-    let hisrory = useNavigate();
+    const navigate = useNavigate();
 
     const item = props.item;
 
@@ -92,7 +93,7 @@ const HeroSlideItem = props => {
                     <h2 className="title">{item.title}</h2>
                     <div className="overview">{item.overview}</div>
                     <div className="btns">
-                        <Button onClick={() => hisrory.push('/movie/' + item.id)}>
+                    <Button onClick={() => navigate('/movie/' + item.id)}>
                             Watch now
                         </Button>
                         <OutlineButton onClick={setModalActive}>

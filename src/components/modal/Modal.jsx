@@ -1,47 +1,78 @@
+// File: src/components/modal/Modal.jsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import './modal.scss';
 
-const Modal = props => {
+/**
+ * Modal Component - Wrapper for modal dialog
+ */
+const Modal = ({ active = false, id, children }) => {
+  const [isActive, setIsActive] = useState(active);
 
-    const [active, setActive] = useState(false);
+  // Update internal state when prop changes
+  useEffect(() => {
+    setIsActive(active);
+  }, [active]);
 
-    useEffect(() => {
-        setActive(props.active);
-    }, [props.active]);
+  // Handle backdrop click to close modal
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      const modal = e.currentTarget;
+      modal.classList.remove('active');
+      setIsActive(false);
+    }
+  };
 
-    return (
-        <div id={props.id} className={`modal ${active ? 'active' : ''}`}>
-            {props.children}
-        </div>
-    );
-}
+  return (
+    <div
+      id={id}
+      className={`modal ${isActive ? 'active' : ''}`}
+      onClick={handleBackdropClick}
+    >
+      <div className="modal__overlay"></div>
+      <div className="modal__container">
+        {children}
+      </div>
+    </div>
+  );
+};
 
 Modal.propTypes = {
-    active: PropTypes.bool,
-    id: PropTypes.string
-}
+  active: PropTypes.bool,
+  id: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
 
-export const ModalContent = props => {
+/**
+ * ModalContent Component - Content inside the modal with close button
+ */
+export const ModalContent = ({ onClose, children }) => {
+  const contentRef = useRef(null);
 
-    const contentRef = useRef(null);
-
-    const closeModal = () => {
-        contentRef.current.parentNode.classList.remove('active');
-        if (props.onClose) props.onClose();
+  const handleClose = () => {
+    const modal = contentRef.current?.parentNode?.parentNode;
+    if (modal) {
+      modal.classList.remove('active');
     }
+    if (onClose) onClose();
+  };
 
-    return (
-        <div ref={contentRef} className="modal__content">
-            {props.children}
-            <div className="modal__content__close" onClick={closeModal}>
-                <i className="bx bx-x"></i>
-            </div>
-        </div>
-    )
-}
+  return (
+    <div ref={contentRef} className="modal__content">
+      {children}
+      <button type="button" className="modal__content__close" onClick={handleClose}>
+        <i className="bx bx-x"></i>
+      </button>
+    </div>
+  );
+};
 
 ModalContent.propTypes = {
-    onClose: PropTypes.func
-}
+  onClose: PropTypes.func,
+  children: PropTypes.node.isRequired,
+};
+
+// Export Modal as default and ModalContent as named export
+export default Modal;
